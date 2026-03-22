@@ -20,6 +20,13 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* スマホでのタップ時の青いハイライトや、意図しないテキスト選択を防ぐ */
+        button, a, .mc-preview-box, .tool-item, .logo {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
         body {
             font-family: 'Poppins', 'Mochiy Pop One', sans-serif;
             font-weight: 500;
@@ -606,11 +613,11 @@
                     <p style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">マイクラの§を使った装飾を作れます</p>
                 </a>
                 <div class="tool-item">
-                    <h3 style="margin-bottom: 10px; font-size: 1.2rem;">Coming soon</h3>
+                    <h3 style="margin-bottom: 10px; font-size: 1.2rem;">Image Converter</h3>
                     <p style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Coming soon</p>
                 </div>
                 <div class="tool-item">
-                    <h3 style="margin-bottom: 10px; font-size: 1.2rem;">Coming soon</h3>
+                    <h3 style="margin-bottom: 10px; font-size: 1.2rem;">Text Encrypter</h3>
                     <p style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Coming soon</p>
                 </div>
             </div>
@@ -676,7 +683,7 @@
             <p>ここはまだ工事中です</p>
             <p style="margin-bottom: 30px;">押すなよ？押すなよ？</p>
             <div style="display: flex; gap: 20px;">
-                <button class="btn-gradient" onclick="this.innerText='おお　笑'; setTimeout(() => this.innerText='中を見る', 2000)">中を見る</button>
+                <button class="btn-gradient" onclick="this.innerText='田所工事中　笑...'; setTimeout(() => this.innerText='中を見る', 2000)">中を見る</button>
                 <button class="btn-gradient" style="background: rgba(255, 255, 255, 0.1); box-shadow: none; border: 1px solid rgba(255,255,255,0.2);" onclick="window.location.hash='home'">戻る</button>
             </div>
         </section>
