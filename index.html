@@ -20,13 +20,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* スマホでのタップ時の青いハイライトや、意図しないテキスト選択を防ぐ */
-        button, a, .mc-preview-box, .tool-item, .logo {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
         body {
             font-family: 'Poppins', 'Mochiy Pop One', sans-serif;
             font-weight: 500;
@@ -187,7 +180,6 @@
             display: grid;
             grid-template-rows: minmax(0, 1fr);
             grid-template-columns: minmax(0, 1fr);
-            /* align-items: center; は削除し、中の要素(section)にmargin: autoを持たせることで上部突き抜けを防止します */
             padding: 110px 20px 20px 20px; 
             position: relative;
             z-index: 1;
@@ -229,7 +221,7 @@
         /* --- セクション表示・アニメーション --- */
         section {
             grid-area: 1 / 1; 
-            margin: auto; /* コンテナ内で中央寄せ。中身が大きすぎるときは上をはみ出さず下に伸びます */
+            margin: auto; 
             width: 100%;
             max-width: 900px;
             max-height: 100%; 
@@ -366,8 +358,9 @@
             box-shadow: 0 5px 15px rgba(51, 217, 255, 0.1);
         }
 
-        /* --- MC-Decoration ツール専用スタイル --- */
-        
+        /* =========================================================
+           MC-Decoration 専用スタイル 
+           ========================================================= */
         .mc-edition-toggle {
             display: flex;
             justify-content: center;
@@ -386,74 +379,28 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        .mc-edition-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
+        .mc-edition-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
         .mc-edition-btn.active {
             background: var(--light-blue);
             color: var(--dark-deep);
             border-color: var(--light-blue);
             box-shadow: 0 0 15px rgba(51, 217, 255, 0.4);
         }
+        #sec-tool-mc-decoration[data-edition="je"] .be-only { display: none !important; }
+        #sec-tool-mc-decoration[data-edition="be"] .je-only { display: none !important; }
 
-        #sec-tool-mc-decoration[data-edition="je"] .be-only {
-            display: none !important;
-        }
-        #sec-tool-mc-decoration[data-edition="be"] .je-only {
-            display: none !important;
-        }
-
-        /* --- リアルタイムプレビュー (オークの看板風UI) --- */
-        .mc-preview-container {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .mc-preview-title {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
+        .mc-preview-container { margin-bottom: 20px; text-align: left; }
+        .mc-preview-title { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 5px; font-weight: 600; }
         .mc-preview-box {
-            width: 100%;
-            min-height: 100px;
-            background-color: #a07a50; 
-            background-image: 
-                repeating-linear-gradient(
-                    rgba(0, 0, 0, 0.05) 0px,
-                    rgba(0, 0, 0, 0.05) 2px,
-                    transparent 2px,
-                    transparent 6px
-                ),
-                repeating-linear-gradient(
-                    90deg,
-                    #987146 0px,
-                    #a07a50 15px,
-                    #90683c 30px
-                );
-            border: 4px solid #4a3219; 
-            border-radius: 4px;
-            padding: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 18px;
-            color: #000000; 
-            white-space: pre-wrap;
-            word-break: break-all;
-            line-height: 1.4;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 0 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            position: relative;
-            transition: filter 0.2s, transform 0.1s;
+            width: 100%; min-height: 100px; background-color: #a07a50; 
+            background-image: repeating-linear-gradient(rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 6px),
+                              repeating-linear-gradient(90deg, #987146 0px, #a07a50 15px, #90683c 30px);
+            border: 4px solid #4a3219; border-radius: 4px; padding: 15px; font-family: 'Courier New', Courier, monospace;
+            font-size: 18px; color: #000000; white-space: pre-wrap; word-break: break-all; line-height: 1.4;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 0 10px rgba(0,0,0,0.3); cursor: pointer; transition: filter 0.2s, transform 0.1s;
         }
-
-        .mc-preview-box:hover {
-            filter: brightness(1.1); 
-        }
-        .mc-preview-box:active {
-            transform: scale(0.98); 
-        }
+        .mc-preview-box:hover { filter: brightness(1.1); }
+        .mc-preview-box:active { transform: scale(0.98); }
 
         .mc-prev-0 { color: #000000; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); } 
         .mc-prev-1 { color: #0000AA; text-shadow: 2px 2px 0 #00002A; }
@@ -472,97 +419,123 @@
         .mc-prev-e { color: #FFFF55; text-shadow: 2px 2px 0 #3F3F15; }
         .mc-prev-f { color: #FFFFFF; text-shadow: 2px 2px 0 #3F3F3F; }
         .mc-prev-g { color: #DDD605; text-shadow: 2px 2px 0 #373501; }
-
-        .mc-prev-l { font-weight: bold; }
-        .mc-prev-o { font-style: italic; }
-        .mc-prev-n { text-decoration: underline; }
-        .mc-prev-m { text-decoration: line-through; }
-        .mc-prev-n.mc-prev-m { text-decoration: underline line-through; }
+        .mc-prev-l { font-weight: bold; } .mc-prev-o { font-style: italic; } .mc-prev-n { text-decoration: underline; }
+        .mc-prev-m { text-decoration: line-through; } .mc-prev-n.mc-prev-m { text-decoration: underline line-through; }
 
         .mc-textarea {
+            width: 100%; height: 80px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px; color: white; padding: 10px; font-family: 'Poppins', 'Mochiy Pop One', monospace;
+            font-size: 14px; resize: vertical; margin-bottom: 20px; outline: none; transition: 0.3s;
+        }
+        .mc-textarea:focus { border-color: var(--light-blue); box-shadow: 0 0 15px rgba(51, 217, 255, 0.2); }
+        .mc-btn-group-title { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 10px; font-weight: 600; }
+        .mc-buttons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .mc-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 10px 0; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; text-align: center; }
+        .mc-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+
+        .mc-c-0 { color: #000000; text-shadow: 0 0 2px rgba(255,255,255,0.5); } .mc-c-1 { color: #0000AA; } .mc-c-2 { color: #00AA00; }
+        .mc-c-3 { color: #00AAAA; } .mc-c-4 { color: #AA0000; } .mc-c-5 { color: #AA00AA; } .mc-c-6 { color: #FFAA00; }
+        .mc-c-7 { color: #AAAAAA; } .mc-c-8 { color: #555555; } .mc-c-9 { color: #5555FF; } .mc-c-a { color: #55FF55; }
+        .mc-c-b { color: #55FFFF; } .mc-c-c { color: #FF5555; } .mc-c-d { color: #FF55FF; } .mc-c-e { color: #FFFF55; }
+        .mc-c-f { color: #FFFFFF; } .mc-c-g { color: #DDD605; } .mc-c-format { color: white; }
+
+        /* =========================================================
+           サンライズ空席照会ツール 専用スタイル 
+           ========================================================= */
+        .glass-input {
             width: 100%;
-            height: 80px;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             color: white;
-            padding: 10px;
-            font-family: 'Poppins', 'Mochiy Pop One', monospace;
+            padding: 12px;
+            font-family: 'Poppins', 'Mochiy Pop One', sans-serif;
             font-size: 14px;
-            resize: vertical;
             margin-bottom: 20px;
             outline: none;
             transition: 0.3s;
         }
-        .mc-textarea:focus {
-            border-color: var(--light-blue);
-            box-shadow: 0 0 15px rgba(51, 217, 255, 0.2);
+        .glass-input:focus {
+            border-color: #ff4b2b; /* サンライズカラー */
+            box-shadow: 0 0 15px rgba(255, 75, 43, 0.2);
         }
-
-        .mc-btn-group-title {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .mc-buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .mc-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 10px 0;
+        /* ダークテーマ用カレンダーアイコンの色反転 */
+        .glass-input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
             cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: 0.2s;
-            text-align: center;
         }
-        .mc-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+        .glass-input option {
+            background: var(--dark-deep);
+            color: white;
         }
 
-        .mc-c-0 { color: #000000; text-shadow: 0 0 2px rgba(255,255,255,0.5); } 
-        .mc-c-1 { color: #0000AA; } 
-        .mc-c-2 { color: #00AA00; }
-        .mc-c-3 { color: #00AAAA; }
-        .mc-c-4 { color: #AA0000; }
-        .mc-c-5 { color: #AA00AA; }
-        .mc-c-6 { color: #FFAA00; }
-        .mc-c-7 { color: #AAAAAA; }
-        .mc-c-8 { color: #555555; }
-        .mc-c-9 { color: #5555FF; }
-        .mc-c-a { color: #55FF55; }
-        .mc-c-b { color: #55FFFF; }
-        .mc-c-c { color: #FF5555; }
-        .mc-c-d { color: #FF55FF; }
-        .mc-c-e { color: #FFFF55; }
-        .mc-c-f { color: #FFFFFF; }
-        .mc-c-g { color: #DDD605; } 
-        .mc-c-format { color: white; }
+        .sunrise-warning {
+            background: rgba(255, 50, 50, 0.1);
+            border-left: 4px solid #ff4b2b;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 20px;
+        }
+        .sunrise-warning a {
+            color: #ff8888;
+            text-decoration: underline;
+        }
+
+        .btn-sunrise-red {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            box-shadow: 0 10px 30px rgba(255, 65, 108, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px;
+            font-size: 1.1rem;
+        }
+        .btn-sunrise-red:hover {
+            box-shadow: 0 15px 40px rgba(255, 65, 108, 0.4);
+        }
+        .btn-sunrise-red.animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .seat-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-bottom: 10px;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+        }
+        .seat-btn:hover { transform: translateY(-2px); }
+        .seat-single { background: rgba(79, 70, 229, 0.5); border-color: rgba(79, 70, 229, 0.8); }
+        .seat-single:hover { background: rgba(79, 70, 229, 0.7); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4); }
+        .seat-solo { background: rgba(16, 185, 129, 0.5); border-color: rgba(16, 185, 129, 0.8); }
+        .seat-solo:hover { background: rgba(16, 185, 129, 0.7); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); }
+        .seat-nobi { background: rgba(249, 115, 22, 0.5); border-color: rgba(249, 115, 22, 0.8); }
+        .seat-nobi:hover { background: rgba(249, 115, 22, 0.7); box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
 
         @media (max-width: 768px) {
             nav { padding: 20px; flex-direction: column; gap: 15px; }
             .nav-links { gap: 15px; flex-wrap: wrap; justify-content: center; }
             .mc-buttons-grid { grid-template-columns: repeat(4, 1fr); }
             
-            .container {
-                padding-top: 150px; 
-            }
-            section.glass-card {
-                padding: 25px 20px; 
-            }
-            .mc-edition-toggle {
-                flex-direction: column;
-                gap: 10px;
-            }
+            .container { padding-top: 150px; }
+            section.glass-card { padding: 25px 20px; }
+            .mc-edition-toggle { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -591,12 +564,14 @@
         <div class="liquid-blob blob-1"></div>
         <div class="liquid-blob blob-2"></div>
 
+        <!-- Home -->
         <section id="sec-home" class="active">
             <h1 class="hero-title typing-cursor" id="typing-target"> </h1>
             <p class="hero-sub" id="typing-sub"></p>
             <button class="btn-gradient" onclick="window.location.hash='about'">Who are u?</button>
         </section>
 
+        <!-- About -->
         <section id="sec-about" class="glass-card">
             <h2>About Me</h2>
             <p>インターネットでもぞもぞしてるpekoです。IDがよくかぶるのでpekopekoだったりpekotannだったりします。</p>
@@ -604,6 +579,7 @@
             <button class="btn-gradient" onclick="window.location.hash='home'">Back to Start</button>
         </section>
 
+        <!-- Tool Menu -->
         <section id="sec-tool" class="glass-card">
             <h2>Tools</h2>
             <p>自分用に制作した便利ツールです。</p>
@@ -611,6 +587,11 @@
                 <a href="#tool/mc-decoration" class="tool-item">
                     <h3 style="margin-bottom: 10px; font-size: 1.2rem; color: var(--light-blue);">文字装飾ジェネレータ</h3>
                     <p style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">マイクラの§を使った装飾を作れます</p>
+                </a>
+                <!-- 新規追加：サンライズ空席照会 -->
+                <a href="#tool/sunrise" class="tool-item" style="border-color: rgba(255, 75, 43, 0.3);">
+                    <h3 style="margin-bottom: 10px; font-size: 1.2rem; color: #ff8888;">サンライズ空席照会</h3>
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">e5489直リンク生成ツール</p>
                 </a>
                 <div class="tool-item">
                     <h3 style="margin-bottom: 10px; font-size: 1.2rem;">Image Converter</h3>
@@ -624,8 +605,78 @@
             <button class="btn-gradient" onclick="window.location.hash='home'">Back to Start</button>
         </section>
 
+        <!-- ==============================================
+             Tool: サンライズ空席照会
+             ============================================== -->
+        <section id="sec-tool-sunrise" class="glass-card">
+            <h2 style="color: #ef6363;">サンライズ空席照会</h2>
+            
+            <div style="text-align: center; margin-bottom: 25px;">
+                <p style="font-size: 0.9rem; margin-bottom: 8px; color: rgba(255,255,255,0.8);">ネット予約は05:30~25:50まで</p>
+                <!-- リアルタイム時計 -->
+                <div id="sunrise-clock" style="font-family: 'Courier New', Courier, monospace; font-size: 1.3rem; font-weight: bold; background: rgba(0,0,0,0.4); padding: 8px 20px; border-radius: 30px; display: inline-block; border: 1px solid rgba(255,255,255,0.15); box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                    00月00日 00:00:00
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <!-- 日付選択 -->
+                <div>
+                    <label style="display:block; font-size:0.9rem; margin-bottom:5px; color:rgba(255,255,255,0.8);" for="sunrise-date">乗車日</label>
+                    <input type="date" id="sunrise-date" class="glass-input" onchange="updateSunriseLinks()">
+                </div>
+
+                <!-- 区間（列車）選択 -->
+                <div>
+                    <label style="display:block; font-size:0.9rem; margin-bottom:5px; color:rgba(255,255,255,0.8);" for="sunrise-route">区間（列車）</label>
+                    <select id="sunrise-route" class="glass-input" onchange="updateSunriseLinks()">
+                        <option value="tokyo_takamatsu">東京 → 高松（サンライズ瀬戸）</option>
+                        <option value="takamatsu_tokyo">高松 → 東京（サンライズ瀬戸）</option>
+                        <option value="tokyo_izumoshi">東京 → 出雲市（サンライズ出雲）</option>
+                        <option value="izumoshi_tokyo">出雲市 → 東京（サンライズ出雲）</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 一括照会ボタン -->
+            <button onclick="openSunriseAllTabs()" class="btn-gradient btn-sunrise-red animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>3設備まとめて同時照会（別タブ）</span>
+            </button>
+
+            <!-- リンク出力エリア -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-bottom: 10px;">
+                <p style="font-size: 0.9rem; margin-bottom: 15px; color:rgba(255,255,255,0.8); text-align: center;">または、個別で照会する</p>
+                <div id="sunrise-links" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <!-- JavaScriptでここにボタンが生成されます -->
+                </div>
+            </div>
+
+            <!-- 注意書き -->
+            <div class="sunrise-warning">
+                <p style="font-weight: bold; margin-bottom: 5px; color: #ffcccc; text-decoration: underline;">重要：ログインについて</p>
+                <p style="margin-bottom: 5px; font-size: 0.9rem;">事前に別タブで<a href="https://www.jr-odekake.net/goyoyaku/e5489/" target="_blank">e5489にログイン</a>しておいてください。</p>
+                <p style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 15px;">※ブラウザの設定で「ポップアップ」を許可してください。</p>
+                
+                <div style="font-size: 0.7rem; opacity: 0.6; line-height: 1.5; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
+                    <p>【e5489に関する規約 第29条 （サービス利用者の義務）抜粋】</p>
+                    <p>（1）インターネット利用の一般的なマナーおよび技術的ルールを遵守します。</p>
+                    <p>※自動化や過度な連続アクセスはお控えください。</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn-gradient" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;" onclick="window.location.hash='tool'">一覧に戻る</button>
+            </div>
+        </section>
+
+        <!-- ==============================================
+             Tool: MC-Decoration
+             ============================================== -->
         <section id="sec-tool-mc-decoration" class="glass-card" data-edition="je">
-            <h2>MC-Decoration</h2>
+            <h2>文字装飾ジェネレータ</h2>
             
             <div class="mc-edition-toggle">
                 <button class="mc-edition-btn active" id="btn-edition-je" onclick="setMcEdition('je')">Java Edition (JE)</button>
@@ -678,6 +729,7 @@
             </div>
         </section>
 
+        <!-- Secret -->
         <section id="sec-secret" class="glass-card" style="border-color: rgba(51, 217, 255, 0.3); background: rgba(51, 217, 255, 0.05);">
             <h2 style="color: var(--light-blue); text-shadow: 0 0 15px rgba(51, 217, 255, 0.5);">Secret Room</h2>
             <p>ここはまだ工事中です</p>
@@ -690,6 +742,9 @@
     </div>
 
     <script>
+        // =========================================================
+        // 共通処理・ルーティング
+        // =========================================================
         let mainTimer;
 
         function handleLogoClick(element) {
@@ -759,57 +814,192 @@
         }
 
         window.addEventListener('hashchange', handleHashChange);
+
         window.onload = () => { 
             handleHashChange(); 
             initParticles(); 
+            
+            // サンライズ空席照会の初期化処理
+            initSunriseTool();
         };
 
         function initParticles() {
             const container = document.getElementById('particles-container');
             if (!container) return;
-            
             const particleCount = 45; 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
-                
                 const size = Math.random() * 30 + 5; 
                 const left = Math.random() * 100; 
                 const duration = Math.random() * 20 + 15; 
                 const delay = Math.random() * 30; 
-                
                 const isBlue = Math.random() > 0.5;
                 const r = isBlue ? Math.floor(Math.random() * 55 + 170) : 255; 
                 const g = isBlue ? Math.floor(Math.random() * 55 + 200) : 255; 
                 const b = 255;
                 const rgb = `${r}, ${g}, ${b}`;
-
                 const maxOpacity = Math.random() * 0.25 + 0.15;
-                
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 particle.style.left = `${left}vw`;
-                
                 particle.style.background = `radial-gradient(circle, rgba(${rgb}, 1) 0%, rgba(${rgb}, 0) 70%)`;
                 particle.style.setProperty('--max-opacity', maxOpacity);
-
                 const animType = Math.floor(Math.random() * 3) + 1;
                 particle.style.animation = `float${animType} ${duration}s ease-in-out infinite`;
-                
                 particle.style.animationDelay = `-${delay}s`; 
-                
                 container.appendChild(particle);
             }
         }
 
+        // =========================================================
+        // サンライズ空席照会ツール スクリプト
+        // =========================================================
+        
+        // 仕様書準拠：エンコードされたコアデータ（Shift-JIS）
+        const SUNRISE_STATIONS = {
+            tokyo: "%93%8C%8B%9E",
+            takamatsu: "%8D%82%8F%BC%81i%8D%81%90%EC%8C%A7%81j",
+            izumoshi: "%8Fo%89_%8Es"
+        };
+
+        const SUNRISE_TRAIN_TYPES = {
+            seto: {
+                nobinobi: "%BB%BE%C4%20%20000",
+                single: "%BB%BE%C4%BC%20000",
+                solo: "%BB%BE%C4%BF%20000"
+            },
+            izumo: {
+                nobinobi: "%BB%B2%BD%D3%20000",
+                single: "%BB%B2%BD%D3%BC000",
+                solo: "%BB%B2%BD%D3%BF000"
+            }
+        };
+
+        function initSunriseTool() {
+            // 初期日付の設定（システム当日の日付）
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const dateInput = document.getElementById('sunrise-date');
+            
+            if (dateInput) {
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+                updateSunriseLinks();
+            }
+            
+            // リアルタイム時計の開始
+            updateSunriseClock();
+            setInterval(updateSunriseClock, 1000);
+        }
+
+        function updateSunriseClock() {
+            const clockEl = document.getElementById('sunrise-clock');
+            if (!clockEl) return;
+            
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            clockEl.textContent = `${month}月${date}日 ${hours}:${minutes}:${seconds}`;
+        }
+
+        function getSunriseSelection() {
+            const dateInput = document.getElementById('sunrise-date').value;
+            if (!dateInput) return null;
+            
+            const dateStr = dateInput.replace(/-/g, ""); // YYYYMMDDへ変換
+            const route = document.getElementById('sunrise-route').value;
+
+            let departSt, arriveSt, trainSet;
+            if (route === "tokyo_takamatsu") {
+                departSt = SUNRISE_STATIONS.tokyo; arriveSt = SUNRISE_STATIONS.takamatsu; trainSet = SUNRISE_TRAIN_TYPES.seto;
+            } else if (route === "takamatsu_tokyo") {
+                departSt = SUNRISE_STATIONS.takamatsu; arriveSt = SUNRISE_STATIONS.tokyo; trainSet = SUNRISE_TRAIN_TYPES.seto;
+            } else if (route === "tokyo_izumoshi") {
+                departSt = SUNRISE_STATIONS.tokyo; arriveSt = SUNRISE_STATIONS.izumoshi; trainSet = SUNRISE_TRAIN_TYPES.izumo;
+            } else if (route === "izumoshi_tokyo") {
+                departSt = SUNRISE_STATIONS.izumoshi; arriveSt = SUNRISE_STATIONS.tokyo; trainSet = SUNRISE_TRAIN_TYPES.izumo;
+            }
+
+            return { departSt, arriveSt, dateStr, trainSet };
+        }
+
+        function updateSunriseLinks() {
+            const data = getSunriseSelection();
+            if (!data) return;
+
+            const container = document.getElementById('sunrise-links');
+            container.innerHTML = ""; // クリア
+
+            // 3つの座席タイプの個別リンクを作成
+            const seats = [
+                { id: 'single', label: 'シングル', class: 'seat-single' },
+                { id: 'solo', label: 'ソロ', class: 'seat-solo' },
+                { id: 'nobinobi', label: 'のびのび座席', class: 'seat-nobi' }
+            ];
+
+            seats.forEach(seat => {
+                const url = generateSunriseUrl(data.departSt, data.arriveSt, data.dateStr, data.trainSet[seat.id]);
+                const btn = document.createElement('a');
+                btn.href = url;
+                btn.target = "_blank";
+                btn.className = `seat-btn ${seat.class}`;
+                btn.textContent = seat.label;
+                container.appendChild(btn);
+            });
+        }
+
+        function openSunriseAllTabs() {
+            const data = getSunriseSelection();
+            if (!data) return;
+
+            // 順番に開く（ポップアップブロック注意）
+            window.open(generateSunriseUrl(data.departSt, data.arriveSt, data.dateStr, data.trainSet.single), "_blank");
+            window.open(generateSunriseUrl(data.departSt, data.arriveSt, data.dateStr, data.trainSet.solo), "_blank");
+            window.open(generateSunriseUrl(data.departSt, data.arriveSt, data.dateStr, data.trainSet.nobinobi), "_blank");
+        }
+
+        function generateSunriseUrl(departSt, arriveSt, dateStr, trainKana) {
+            // 仕様書準拠：固定・動的パラメータの結合
+            const baseUrl = "https://e5489.jr-odekake.net/e5489/cspc/CBDayTimeArriveSelRsvMyDiaPC";
+            const params = [
+                `inputDepartStName=${departSt}`,
+                `inputArriveStName=${arriveSt}`,
+                `inputType=0`,
+                `inputDate=${dateStr}`,
+                `inputHour=15`,
+                `inputMinute=00`,
+                `inputUniqueDepartSt=1`,
+                `inputUniqueArriveSt=1`,
+                `inputSearchType=2`,
+                `inputTransferDepartStName1=${departSt}`,
+                `inputTransferArriveStName1=${arriveSt}`,
+                `inputTransferDepartStUnique1=1`,
+                `inputTransferArriveStUnique1=1`,
+                `inputTransferTrainType1=0001`,
+                `inputSpecificTrainType1=2`,
+                `inputSpecificBriefTrainKana1=${trainKana}`,
+                `SequenceType=0`,
+                `inputReturnUrl=goyoyaku/campaign/sunriseseto_izumo/form.html`
+            ];
+            return baseUrl + "?" + params.join("&");
+        }
+
+
+        // =========================================================
+        // MC-Decoration スクリプト
+        // =========================================================
         function setMcEdition(edition) {
             const container = document.getElementById('sec-tool-mc-decoration');
             container.setAttribute('data-edition', edition);
-            
             document.getElementById('btn-edition-je').classList.remove('active');
             document.getElementById('btn-edition-be').classList.remove('active');
             document.getElementById('btn-edition-' + edition).classList.add('active');
-            
             updatePreview(); 
         }
 
@@ -818,14 +1008,11 @@
             const startPos = textarea.selectionStart;
             const endPos = textarea.selectionEnd;
             const text = textarea.value;
-            
             textarea.value = text.substring(0, startPos) + tag + text.substring(endPos, text.length);
-            
             const newPos = startPos + tag.length;
             textarea.selectionStart = newPos;
             textarea.selectionEnd = newPos;
             textarea.focus();
-            
             updatePreview(); 
         }
 
@@ -845,20 +1032,13 @@
             const textarea = document.getElementById('mc-text-input');
             const preview = document.getElementById('mc-preview');
             const text = textarea.value;
-            
             if (!text) return; 
-            
             textarea.select();
             try {
                 document.execCommand('copy');
                 preview.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#00AA00; font-weight:bold; font-size:1.5rem; text-shadow:2px 2px 0 #002A00;">Copied!</div>';
-                
-                setTimeout(() => {
-                    updatePreview();
-                }, 1500);
-            } catch (err) {
-                console.error('Copy failed', err);
-            }
+                setTimeout(() => { updatePreview(); }, 1500);
+            } catch (err) { console.error('Copy failed', err); }
             window.getSelection().removeAllRanges();
         }
 
@@ -875,11 +1055,7 @@
 
             let html = '';
             let currentColor = 'mc-prev-0'; 
-            let isBold = false;
-            let isItalic = false;
-            let isUnderline = false;
-            let isStrikethrough = false;
-            let isObfuscated = false;
+            let isBold = false; let isItalic = false; let isUnderline = false; let isStrikethrough = false; let isObfuscated = false;
 
             const regex = edition === 'be' ? /(§[0-9a-fgk-or])/i : /(§[0-9a-fk-or])/i;
             const parts = text.split(regex);
@@ -892,19 +1068,11 @@
                     const code = part.charAt(1).toLowerCase();
                     if (code === 'r') {
                         currentColor = 'mc-prev-0';
-                        isBold = false;
-                        isItalic = false;
-                        isUnderline = false;
-                        isStrikethrough = false;
-                        isObfuscated = false;
+                        isBold = false; isItalic = false; isUnderline = false; isStrikethrough = false; isObfuscated = false;
                     } else if ('0123456789abcdefg'.includes(code)) {
                         currentColor = 'mc-prev-' + code;
                         if (edition === 'je') {
-                            isBold = false;
-                            isItalic = false;
-                            isUnderline = false;
-                            isStrikethrough = false;
-                            isObfuscated = false;
+                            isBold = false; isItalic = false; isUnderline = false; isStrikethrough = false; isObfuscated = false;
                         }
                     } else if (code === 'l') { isBold = true; }
                     else if (code === 'o') { isItalic = true; }
@@ -937,10 +1105,8 @@
             document.querySelectorAll('.mc-prev-k').forEach(span => {
                 const originalText = span.getAttribute('data-obf');
                 if (!originalText) return;
-                
                 let randStr = '';
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-                
                 for (let i = 0; i < originalText.length; i++) {
                     if (originalText[i] === ' ' || originalText[i] === '\n') {
                         randStr += originalText[i];
