@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サンライズ空席照会ジェネレータ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #f1f5f9;
+        }
+        .btn-hover-effect {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-hover-effect:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-200">
+        
+        <!-- ヘッダー＆時計表示部分 -->
+        <div class="bg-slate-900 p-6 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            <h1 class="text-2xl font-black text-white tracking-wider relative z-10">サンライズ空席照会<span class="text-amber-400">ジェネレータ</span></h1>
+            
+            <div class="mt-4 inline-block bg-slate-800/80 border border-slate-700 rounded-xl px-6 py-2 relative z-10 shadow-inner">
+                <p class="text-xs text-slate-400 font-bold mb-1 tracking-widest uppercase">Current Time</p>
+                <div id="realtime-clock" class="text-3xl font-mono text-emerald-400 font-medium tracking-tight">
+                    --:--:--
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+            
+            <!-- 注意書きアラート -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-amber-800 font-medium">
+                            事前に別タブで <a href="https://e5489.jr-odekake.net/e5489/cspc/CBTopMenuPC" target="_blank" class="text-blue-600 font-bold underline hover:text-blue-800">e5489にログイン</a> しておいてください。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日付選択 -->
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">乗車日</label>
+                <input type="date" id="date" class="w-full border-2 border-slate-200 rounded-xl p-3 text-lg font-medium text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all" onchange="updateLinks()">
+                
+                <!-- クイック日付ボタン -->
+                <div class="flex gap-2 mt-3">
+                    <button onclick="setDateOffset(0)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-3 rounded-lg transition-colors border border-slate-200">今日</button>
+                    <button onclick="setDateOffset(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-3 rounded-lg transition-colors border border-slate-200">明日</button>
+                    <button onclick="setOneMonthLater()" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold py-2 px-3 rounded-lg transition-colors border border-emerald-200 flex items-center justify-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        1ヶ月後
+                    </button>
+                </div>
+            </div>
+
+            <!-- 区間選択 -->
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">列車と進行方向</label>
+                <div class="relative mb-3">
+                    <select id="train_dir" class="w-full appearance-none border-2 border-slate-200 rounded-xl p-3 pr-10 text-base font-medium text-slate-800 bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all" onchange="onTrainDirChange()">
+                        <option value="seto_down">サンライズ瀬戸 (下り: 東京 ➔ 高松)</option>
+                        <option value="seto_up">サンライズ瀬戸 (上り: 高松 ➔ 東京)</option>
+                        <option value="izumo_down">サンライズ出雲 (下り: 東京 ➔ 出雲市)</option>
+                        <option value="izumo_up">サンライズ出雲 (上り: 出雲市 ➔ 東京)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">乗車駅</label>
+                        <div class="relative">
+                            <select id="depart_st" class="w-full appearance-none border-2 border-slate-200 rounded-xl p-3 pr-8 text-sm font-medium text-slate-800 bg-white focus:outline-none focus:border-emerald-500 transition-all" onchange="onDepartStChange()">
+                                <!-- JSで動的に生成 -->
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">降車駅</label>
+                        <div class="relative">
+                            <select id="arrive_st" class="w-full appearance-none border-2 border-slate-200 rounded-xl p-3 pr-8 text-sm font-medium text-slate-800 bg-white focus:outline-none focus:border-emerald-500 transition-all" onchange="updateLinks()">
+                                <!-- JSで動的に生成 -->
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- リンク出力エリア -->
+            <div class="pt-6 border-t-2 border-slate-100 border-dashed">
+                <h3 class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider text-center">照会リンク</h3>
+                
+                <div id="links" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <!-- JavaScriptでここにボタンが生成されます -->
+                </div>
+
+                <!-- 一括照会ボタン -->
+                 <!-- <button onclick="openAllTabs()" class="w-full group relative overflow-hidden bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                    <span>全設備を別タブで一括照会</span>
+                </button>
+                <p class="text-center text-[10px] text-slate-400 mt-2">※ブラウザのポップアップブロックを許可してください</p>
+                
+                -->
+                 
+                
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 駅名のShift-JISエンコード値
+        const STATIONS = {
+            tokyo: { name: "東京", code: "%93%8C%8B%9E" },
+            yokohama: { name: "横浜", code: "%89%A3%95l" },
+            atami: { name: "熱海", code: "%94M%8AC" },
+            numazu: { name: "沼津", code: "%8F%C0%92%C3" },
+            fuji: { name: "富士", code: "%95x%8Em" },
+            shizuoka: { name: "静岡", code: "%90%C3%89%AA" },
+            hamamatsu: { name: "浜松", code: "%95l%8F%BC" },
+            osaka: { name: "大阪", code: "%91%E5%8D%E3" },
+            sannomiya: { name: "三ノ宮", code: "%8EO%83m%8B%7B" },
+            himeji: { name: "姫路", code: "%95P%98H" },
+            okayama: { name: "岡山", code: "%89%AA%8ER" },
+            kojima: { name: "児島", code: "%8E%99%93%87" },
+            sakaide: { name: "坂出", code: "%8D%E2%8Fo" },
+            takamatsu: { name: "高松", code: "%8D%82%8F%BC%81i%8D%81%90%EC%8C%A7%81j" },
+            kurashiki: { name: "倉敷", code: "%91q%95%7B" },
+            bitchu_takahashi: { name: "備中高梁", code: "%94%F5%92%86%8D%82%97%B4" },
+            niimi: { name: "新見", code: "%90V%8C%A9" },
+            yonago: { name: "米子", code: "%95%C4%8Eq" },
+            yasugi: { name: "安来", code: "%88%C0%97%88" },
+            matsue: { name: "松江", code: "%8F%BC%8D%5D" },
+            shinji: { name: "宍道", code: "%90%B5%93%B9" },
+            izumoshi: { name: "出雲市", code: "%8Fo%89_%8Es" }
+        };
+
+        // 列車・設備のShift-JISエンコード値
+        const TRAIN_TYPES = {
+            seto: {
+                single: "%BB%BE%C4%BC%20000", // ｻｾﾄｼ 000
+                solo: "%BB%BE%C4%BF%20000",   // ｻｾﾄｿ 000
+                twin: "%BB%BE%C4%BB%20000",   // ｻｾﾄｻ 000
+                others: "%BB%BE%C4%20%20000"  // ｻｾﾄ  000 (ノビノビ/シンデラ/シンツイ)
+            },
+            izumo: {
+                single: "%BB%B2%BD%D3%BC000", // ｻｲｽﾓｼ000
+                solo: "%BB%B2%BD%D3%BF000",   // ｻｲｽﾓｿ000
+                twin: "%BB%B2%BD%D3%BB000",   // ｻｲｽﾓｻ000
+                others: "%BB%B2%BD%D3%20000"  // ｻｲｽﾓ 000 (ノビノビ/シンデラ/シンツイ)
+            }
+        };
+
+        // UI表示用の座席設定
+        const SEAT_CONFIG = [
+            { id: 'single', label: 'シングル', colorClasses: 'bg-blue-600 hover:bg-blue-700' },
+            { id: 'solo', label: 'ソロ', colorClasses: 'bg-teal-600 hover:bg-teal-700' },
+            { id: 'twin', label: 'ｻﾝﾗｲｽﾞﾂｲﾝ', colorClasses: 'bg-purple-600 hover:bg-purple-700' },
+            { id: 'others', label: 'ﾉﾋﾞﾉﾋﾞ/ｼﾝﾃﾞﾗ/ｼﾝﾂｲﾝ', colorClasses: 'bg-orange-500 hover:bg-orange-600' }
+        ];
+
+        // 運行ルート定義（停車駅の順序）
+        const ROUTES = {
+            seto_down: { trainSet: "seto", stops: ["tokyo", "yokohama", "atami", "numazu", "fuji", "shizuoka", "hamamatsu", "himeji", "okayama", "kojima", "sakaide", "takamatsu"] },
+            seto_up: { trainSet: "seto", stops: ["takamatsu", "sakaide", "kojima", "okayama", "himeji", "sannomiya", "osaka", "shizuoka", "fuji", "numazu", "atami", "yokohama", "tokyo"] },
+            izumo_down: { trainSet: "izumo", stops: ["tokyo", "yokohama", "atami", "numazu", "fuji", "shizuoka", "hamamatsu", "himeji", "okayama", "kurashiki", "bitchu_takahashi", "niimi", "yonago", "yasugi", "matsue", "shinji", "izumoshi"] },
+            izumo_up: { trainSet: "izumo", stops: ["izumoshi", "shinji", "matsue", "yasugi", "yonago", "niimi", "bitchu_takahashi", "kurashiki", "okayama", "himeji", "sannomiya", "osaka", "shizuoka", "fuji", "numazu", "atami", "yokohama", "tokyo"] }
+        };
+
+        // 列車方向が変更された時、乗車駅リストを再生成する
+        function onTrainDirChange() {
+            const routeId = document.getElementById('train_dir').value;
+            const route = ROUTES[routeId];
+            const departSelect = document.getElementById('depart_st');
+            
+            departSelect.innerHTML = "";
+            // 乗車駅は終点（配列の最後）を除外して追加
+            for (let i = 0; i < route.stops.length - 1; i++) {
+                const stKey = route.stops[i];
+                const option = document.createElement('option');
+                option.value = stKey;
+                option.text = STATIONS[stKey].name;
+                departSelect.add(option);
+            }
+            onDepartStChange(); // 連動して降車駅もリセット
+        }
+
+        // 乗車駅が変更された時、降車駅リストを動的に絞り込む
+        function onDepartStChange() {
+            const routeId = document.getElementById('train_dir').value;
+            const route = ROUTES[routeId];
+            const departKey = document.getElementById('depart_st').value;
+            const arriveSelect = document.getElementById('arrive_st');
+            
+            const departIndex = route.stops.indexOf(departKey);
+            arriveSelect.innerHTML = "";
+            
+            // 降車駅は「選んだ乗車駅より後にある駅」のみを追加
+            for (let i = departIndex + 1; i < route.stops.length; i++) {
+                const stKey = route.stops[i];
+                const option = document.createElement('option');
+                option.value = stKey;
+                option.text = STATIONS[stKey].name;
+                arriveSelect.add(option);
+            }
+            
+            // デフォルトで終点を選択状態にしておく
+            arriveSelect.selectedIndex = arriveSelect.options.length - 1;
+            
+            updateLinks();
+        }
+
+        // 時計の更新関数
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ms = String(Math.floor(now.getMilliseconds() / 100)).padStart(1, '0'); // 0.1秒単位
+            
+            document.getElementById('realtime-clock').innerHTML = `${hours}:${minutes}:<span class="text-white">${seconds}</span><span class="text-lg text-emerald-600/50">.${ms}</span>`;
+        }
+
+        // 日付をセットするユーティリティ
+        function setDateValue(dateObj) {
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+            updateLinks();
+        }
+
+        // オフセット指定（0=今日、1=明日など）
+        function setDateOffset(days) {
+            const d = new Date();
+            d.setDate(d.getDate() + days);
+            setDateValue(d);
+        }
+
+        // 1ヶ月後（10時打ち用）をセット
+        function setOneMonthLater() {
+            const today = new Date();
+            const target = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            // 月またぎの補正 (例: 1/31の1ヶ月後が3/3になるのを防ぐ)
+            if (target.getMonth() !== (today.getMonth() + 1) % 12) {
+                target.setDate(0); // 前月の末日に戻す
+            }
+            setDateValue(target);
+        }
+
+        // URL生成関数（手動で文字列結合を行うことで二重エンコードを防ぐ）
+        function generateUrl(departSt, arriveSt, dateStr, trainKana) {
+            const baseUrl = "https://e5489.jr-odekake.net/e5489/cspc/CBDayTimeArriveSelRsvMyDiaPC";
+            const params = [
+                `inputDepartStName=${departSt}`,
+                `inputArriveStName=${arriveSt}`,
+                `inputType=0`,
+                `inputDate=${dateStr}`,
+                `inputHour=15`,      // 15時で固定
+                `inputMinute=00`,    // 00分で固定
+                `inputUniqueDepartSt=1`,
+                `inputUniqueArriveSt=1`,
+                `inputSearchType=2`,
+                `inputTransferDepartStName1=${departSt}`, // 乗換出発ダミー
+                `inputTransferArriveStName1=${arriveSt}`, // 乗換到着ダミー
+                `inputTransferDepartStUnique1=1`,
+                `inputTransferArriveStUnique1=1`,
+                `inputTransferTrainType1=0001`,
+                `inputSpecificTrainType1=2`,
+                `inputSpecificBriefTrainKana1=${trainKana}`,
+                `SequenceType=0`,
+                `inputReturnUrl=goyoyaku/campaign/sunriseseto_izumo/form.html`
+            ];
+            return baseUrl + "?" + params.join("&");
+        }
+
+        // 現在の選択状況を取得するヘルパー
+        function getCurrentSelection() {
+            const dateInput = document.getElementById('date').value;
+            if (!dateInput) return null;
+            
+            const dateStr = dateInput.replace(/-/g, "");
+            
+            const routeId = document.getElementById('train_dir').value;
+            const departKey = document.getElementById('depart_st').value;
+            const arriveKey = document.getElementById('arrive_st').value;
+            
+            if (!departKey || !arriveKey) return null;
+
+            const departSt = STATIONS[departKey].code;
+            const arriveSt = STATIONS[arriveKey].code;
+            const trainSet = TRAIN_TYPES[ROUTES[routeId].trainSet];
+            
+            return { departSt, arriveSt, dateStr, trainSet };
+        }
+
+        // リンクUIの更新
+        function updateLinks() {
+            const selection = getCurrentSelection();
+            const container = document.getElementById('links');
+            container.innerHTML = "";
+            
+            if (!selection) return;
+
+            SEAT_CONFIG.forEach(seat => {
+                const url = generateUrl(selection.departSt, selection.arriveSt, selection.dateStr, selection.trainSet[seat.id]);
+                const btn = document.createElement('a');
+                btn.href = url;
+                btn.target = "_blank";
+                btn.className = `btn-hover-effect block w-full ${seat.colorClasses} text-white font-bold py-3 px-4 rounded-xl text-center text-sm flex items-center justify-between group`;
+                
+                btn.innerHTML = `
+                    <span>${seat.label}</span>
+                    <svg class="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // 全設備を一括で開く
+        function openAllTabs() {
+            const selection = getCurrentSelection();
+            if (!selection) return;
+
+            // 各設備のURLを生成し、順番に別タブで開く
+            SEAT_CONFIG.forEach((seat, index) => {
+                const url = generateUrl(selection.departSt, selection.arriveSt, selection.dateStr, selection.trainSet[seat.id]);
+                // ブラウザのポップアップブロック対策として、わずかに遅延を入れて開く
+                setTimeout(() => {
+                    window.open(url, `_blank_${index}`);
+                }, index * 150);
+            });
+        }
+
+        // 初期設定
+        window.onload = function() {
+            setDateOffset(0); // 初期値は今日
+            onTrainDirChange(); // ドロップダウンの初期化を実行
+            
+            // 時計のアニメーションループ (requestAnimationFrameで滑らかに)
+            function loop() {
+                updateClock();
+                requestAnimationFrame(loop);
+            }
+            loop();
+        };
+    </script>
+</body>
+</html>
